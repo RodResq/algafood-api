@@ -24,4 +24,6 @@ public class NotificadorEmail implements Notificador {
                 cliente.getNome(), cliente.getEmail(), mensagem);
     }
 
+    // TODO: 4/2/24 Parei na dúvida:  "Dúvida sobre o empacotamento e a inclusão do configuration-processor".
+
 }
