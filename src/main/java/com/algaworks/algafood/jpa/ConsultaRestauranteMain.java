@@ -1,9 +1,7 @@
 package com.algaworks.algafood.jpa;
 
 import com.algaworks.algafood.AlgafoodApiApplication;
-import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
-import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -18,11 +16,12 @@ public class ConsultaRestauranteMain {
                 .web(WebApplicationType.NONE)
                 .run(args);
 
-        RestauranteRepository restaurante = applicationContext.getBean(RestauranteRepository.class);
-        List<Restaurante> todosRestaurante = restaurante.todos();
+        RestauranteRepository restauranteRepository= applicationContext.getBean(RestauranteRepository.class);
+        List<Restaurante> todosRestaurantes = restauranteRepository.todos();
 
-        for (Restaurante resto: todosRestaurante) {
-            System.out.println(resto.getNome());
+        for (Restaurante restaurante: todosRestaurantes) {
+            System.out.printf("%s -  %.2f - %s\n", restaurante.getNome(), restaurante.getTaxaFrete(),
+                    restaurante.getCozinha().getNome());
         }
     }
 }
