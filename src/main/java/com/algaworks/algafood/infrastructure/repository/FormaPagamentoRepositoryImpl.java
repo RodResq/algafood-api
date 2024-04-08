@@ -21,7 +21,7 @@ public class FormaPagamentoRepositoryImpl implements FormaPagamentoRepository {
     }
 
     @Override
-    public FormaPagamento porId(Long id) {
+    public FormaPagamento buscar(Long id) {
         return entityManager.find(FormaPagamento.class, id);
     }
 
@@ -34,7 +34,7 @@ public class FormaPagamentoRepositoryImpl implements FormaPagamentoRepository {
     @Transactional
     @Override
     public void remover(FormaPagamento formaPagamento) {
-        formaPagamento = porId(formaPagamento.getId());
+        formaPagamento = buscar(formaPagamento.getId());
         entityManager.remove(formaPagamento);
     }
 }

@@ -1,14 +1,13 @@
 package com.algaworks.algafood.domain.repository;
 
 import com.algaworks.algafood.domain.model.Cidade;
-import com.algaworks.algafood.domain.model.Estado;
 
 import java.util.List;
 
 public interface CidadeRepository {
 
     List<Cidade> todos();
-    Cidade porId(Long id);
+    Cidade buscar(Long id);
     Cidade adicionar(Cidade cidade);
     void remover(Cidade cidade);
 }
