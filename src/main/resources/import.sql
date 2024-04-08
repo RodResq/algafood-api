@@ -9,8 +9,8 @@ insert into forma_pagamento(descricao) values ('A vista');
 insert into forma_pagamento(descricao) values ('Credito');
 insert into forma_pagamento(descricao) values ('Debito');
 
-insert into permissao(descricao) values ('Admin');
-insert into permissao(descricao) values ('User');
+insert into permissao(nome, descricao) values ('Fulano', 'Admin');
+insert into permissao(nome, descricao) values ('Ciclano', 'Usuario');
 
 insert into estado(nome) values ('Para');
 insert into estado(nome) values ('Rio de Janeiro');
