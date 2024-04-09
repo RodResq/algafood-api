@@ -3,8 +3,8 @@ package com.algaworks.algafood.api.controller;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.CozinhasXmlWrapper;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +30,30 @@ public class CozinhaController {
     }
 
     @GetMapping("/{cozinhaId}")
-    public ResponseEntity<Cozinha> buscar(@PathVariable Long cozinhaId) {
-        Cozinha cozinha = cozinhaRepository.buscarPorId(cozinhaId);
+    public Cozinha buscar(@PathVariable Long cozinhaId) {
+        return cozinhaRepository.buscarPorId(cozinhaId);
+    }
 
-//        return ResponseEntity.status(HttpStatus.OK).body(cozinha);
-//        return ResponseEntity.ok(cozinha);
-//        Excericio
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, "http://api.algafood.local:8080/cozinhas");
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Cozinha adicionar(@RequestBody Cozinha cozinha) {
+        return cozinhaRepository.salvar(cozinha);
+    }
 
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .headers(headers)
-                .build();
+    @PutMapping("/{cozinhaId}")
+    public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId,
+                                             @RequestBody Cozinha cozinha) {
+        Cozinha cozinhaAtual = cozinhaRepository.buscarPorId(cozinhaId);
+//        cozinhaAtual.setNome(cozinha.getNome());
+        if (cozinhaAtual != null) {
+            BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");
+            cozinhaAtual = cozinhaRepository.salvar(cozinhaAtual);
+
+            return ResponseEntity.ok(cozinhaAtual);
+        }
+
+        return ResponseEntity.notFound().build();
+
     }
 
 }
