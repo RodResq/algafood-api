@@ -17,10 +17,10 @@ public class TesteController {
     @Autowired
     private CozinhaRepository cozinhaRepository;
 
-    @GetMapping("/cozinhas/por-nome")
-    public List<Cozinha> cozinhasPorNome(@RequestParam("nome") String nome) {
-        return cozinhaRepository.consultarPorNome(nome);
-    }
+//    @GetMapping("/cozinhas/por-nome")
+//    public List<Cozinha> cozinhasPorNome(@RequestParam("nome") String nome) {
+//        return cozinhaRepository.consultarPorNome(nome);
+//    }
 
 
 

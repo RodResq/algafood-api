@@ -10,6 +10,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CadastroRestauranteService {
 
@@ -29,11 +31,9 @@ public class CadastroRestauranteService {
 
     public Restaurante salvar(Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.buscarPorId(cozinhaId);
+        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d näo existe", cozinhaId)));
 
-        if (cozinha == null) {
-            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d näo existe", cozinhaId));
-        }
         restaurante.setCozinha(cozinha);
 
         return restauranteRepository.adicionar(restaurante);
@@ -42,16 +42,16 @@ public class CadastroRestauranteService {
     public Restaurante atualizar(Long restauranteId, Restaurante restaurante) {
         Restaurante restauranteAtual = restauranteRepository.porId(restauranteId);
         Long cozinhaId = restaurante.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.buscarPorId(cozinhaId);
+        Optional<Cozinha> cozinha = cozinhaRepository.findById(cozinhaId);
 
-        if (restauranteAtual == null) {
+        if (cozinha.isEmpty()) {
             throw new ResutaranteNaoEncontradoException(String.format("Restaurante com o id %d näo encontrado", restauranteId));
         }
 
-        if (cozinha == null) {
+        if (cozinha.isEmpty()) {
             throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d näo existe", cozinhaId));
         }
-        restaurante.setCozinha(cozinha);
+        restaurante.setCozinha(cozinha.get());
         BeanUtils.copyProperties(restaurante, restauranteAtual, "id");
 
         return restauranteRepository.adicionar(restauranteAtual);
