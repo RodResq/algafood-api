@@ -13,6 +13,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CidadeService {
 
@@ -22,25 +24,25 @@ public class CidadeService {
     @Autowired
     private EstadoRepository estadoRepository;
 
-    public Cidade buscar(Long cidadeId) {
-        return cidadeRepository.buscar(cidadeId);
+    public Optional<Cidade> buscar(Long cidadeId) {
+        return cidadeRepository.findById(cidadeId);
     }
 
     public Cidade salvar(Cidade cidade) {
         Long estadoId = cidade.getEstado().getId();
-        Estado estado = estadoRepository.buscar(estadoId);
+        Optional<Estado> estado = estadoRepository.findById(estadoId);
 
-        if (estado == null) {
+        if (estado.isEmpty()) {
             throw new EntidadeNaoEncontradaException(
                     String.format("O estado com o código %d näo pode ser encontrado", estadoId));
         }
-        cidade.setEstado(estado);
-        return cidadeRepository.adicionar(cidade);
+        cidade.setEstado(estado.get());
+        return cidadeRepository.save(cidade);
     }
 
     public void excluir(Long cidadeId) {
         try {
-            cidadeRepository.remover(cidadeId);
+            cidadeRepository.deleteById(cidadeId);
         } catch (EmptyResultDataAccessException e) {
             throw new EntidadeNaoEncontradaException(String.format("Cidade com o código %d näo encontrada", cidadeId));
         } catch (DataIntegrityViolationException e) {
@@ -51,19 +53,19 @@ public class CidadeService {
 
     public Cidade atualizar(Long cidadeId, Cidade cidade) {
         Long estadoId = cidade.getEstado().getId();
-        Estado estaudoAtual = estadoRepository.buscar(estadoId);
-        Cidade cidadeAtual = buscar(cidadeId);
+        Optional<Estado> estaudoAtual = estadoRepository.findById(estadoId);
+        Optional<Cidade> cidadeAtual = buscar(cidadeId);
 
-        if (estaudoAtual == null) {
+        if (estaudoAtual.isEmpty()) {
             throw new EntidadeNaoEncontradaException(String.format("Estado com o código %d näo encontrado", estadoId));
         }
 
-        if (cidadeAtual == null) {
+        if (cidadeAtual.isEmpty()) {
             throw new CidadeNaoEncontradaException();
         }
-        cidade.setEstado(estaudoAtual);
-        BeanUtils.copyProperties(cidade, cidadeAtual, "id");
+        cidade.setEstado(estaudoAtual.get());
+        BeanUtils.copyProperties(cidade, cidadeAtual.get(), "id");
 
-        return cidadeRepository.adicionar(cidadeAtual);
+        return cidadeRepository.save(cidadeAtual.get());
     }
 }

@@ -1,7 +1,6 @@
 package com.algaworks.algafood.jpa;
 
 import com.algaworks.algafood.AlgafoodApiApplication;
-import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.FormaPagamento;
 import com.algaworks.algafood.domain.repository.FormaPagamentoRepository;
 import org.springframework.boot.WebApplicationType;
@@ -18,7 +17,7 @@ public class ConsultaFormaPagamentoMain {
                 .run(args);
 
         FormaPagamentoRepository formaPagamentoRepository = applicationContext.getBean(FormaPagamentoRepository.class);
-        List<FormaPagamento> todasFormasPagamentos = formaPagamentoRepository.todas();
+        List<FormaPagamento> todasFormasPagamentos = formaPagamentoRepository.findAll();
 
         for (FormaPagamento formaPagamento: todasFormasPagamentos) {
             System.out.println(formaPagamento.getDescricao());

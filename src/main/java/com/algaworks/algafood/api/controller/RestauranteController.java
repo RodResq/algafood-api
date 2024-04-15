@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -28,7 +29,7 @@ public class RestauranteController {
 
     @GetMapping
     public List<Restaurante> listar() {
-        return restauranteRepository.todos();
+        return restauranteRepository.findAll();
     }
 
     @GetMapping("/{restauranteId}")
@@ -67,11 +68,11 @@ public class RestauranteController {
     @PatchMapping("/{restauranteId}")
     public ResponseEntity<?> atualizarRestaurante(@PathVariable Long restauranteId,
                                                   @RequestBody Map<String, Object> campos) {
-        Restaurante restauranteAtual = restauranteRepository.porId(restauranteId);
+        Optional<Restaurante> restauranteAtual = restauranteRepository.findById(restauranteId);
 
-        merge(campos, restauranteAtual);
+        merge(campos, restauranteAtual.get());
 
-        return atualizar(restauranteId, restauranteAtual);
+        return atualizar(restauranteId, restauranteAtual.get());
     }
 
     private void merge(Map<String, Object> dadosOrigem, Restaurante restauranteDestino) {

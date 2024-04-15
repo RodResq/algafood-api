@@ -22,11 +22,11 @@ public class CadastroRestauranteService {
     private CozinhaRepository cozinhaRepository;
 
     public Restaurante buscar(Long restauranteId) {
-        Restaurante restaurante = restauranteRepository.porId(restauranteId);
-        if (restaurante == null) {
+        Optional<Restaurante> restaurante = restauranteRepository.findById(restauranteId);
+        if (restaurante.isEmpty()) {
             throw new EntidadeNaoEncontradaException(String.format("Restaurante %d näo encontrado", restauranteId));
         }
-        return restaurante;
+        return restaurante.get();
     }
 
     public Restaurante salvar(Restaurante restaurante) {
@@ -36,11 +36,11 @@ public class CadastroRestauranteService {
 
         restaurante.setCozinha(cozinha);
 
-        return restauranteRepository.adicionar(restaurante);
+        return restauranteRepository.save(restaurante);
     }
 
     public Restaurante atualizar(Long restauranteId, Restaurante restaurante) {
-        Restaurante restauranteAtual = restauranteRepository.porId(restauranteId);
+        Optional<Restaurante> restauranteAtual = restauranteRepository.findById(restauranteId);
         Long cozinhaId = restaurante.getCozinha().getId();
         Optional<Cozinha> cozinha = cozinhaRepository.findById(cozinhaId);
 
@@ -52,8 +52,9 @@ public class CadastroRestauranteService {
             throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d näo existe", cozinhaId));
         }
         restaurante.setCozinha(cozinha.get());
-        BeanUtils.copyProperties(restaurante, restauranteAtual, "id");
+        BeanUtils.copyProperties(restaurante, restauranteAtual.get(), "id");
 
-        return restauranteRepository.adicionar(restauranteAtual);
+        return restauranteRepository.save(restauranteAtual.get());
     }
+
 }
