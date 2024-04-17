@@ -74,4 +74,9 @@ public class CozinhaController {
        }
     }
 
+    @GetMapping("/exists")
+    public boolean exists(String nome) {
+        return cozinhaRepository.existsByNome(nome);
+    }
+
 }
