@@ -127,7 +127,11 @@ public class RestauranteController {
 
     @GetMapping("/por-frete-gratis")
     public List<Restaurante> restaurantePorNomeTaxaFrete(String nome) {
-
         return restauranteRepository.findAll(comFreteGratis().and(comNomeSemelhante(nome)));
+    }
+
+    @GetMapping("/primeiro")
+    public Optional<Restaurante> buscarPrimeiro() {
+        return restauranteRepository.buscarPrimeiro();
     }
 }

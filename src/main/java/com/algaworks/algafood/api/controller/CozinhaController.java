@@ -79,4 +79,9 @@ public class CozinhaController {
         return cozinhaRepository.existsByNome(nome);
     }
 
+    @GetMapping("/primeira")
+    public Optional<Cozinha> buscarPrimeira() {
+        return cozinhaRepository.buscarPrimeiro();
+    }
+
 }
