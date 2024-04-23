@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.algaworks.algafood.domain.infrastructure.repository.spec.RestauranteSpecs.comFreteGratis;
+import static com.algaworks.algafood.domain.infrastructure.repository.spec.RestauranteSpecs.comNomeSemelhante;
+
 @RestController
 @RequestMapping("/restaurantes")
 public class RestauranteController {
@@ -120,5 +123,11 @@ public class RestauranteController {
     @GetMapping("/por-nome-taxa-frete")
     public List<Restaurante> restaurantePorNomeTaxaFrete(String nome, BigDecimal taxaInicial, BigDecimal taxaFinal) {
         return restauranteRepository.find(nome, taxaInicial, taxaFinal);
+    }
+
+    @GetMapping("/por-frete-gratis")
+    public List<Restaurante> restaurantePorNomeTaxaFrete(String nome) {
+
+        return restauranteRepository.findAll(comFreteGratis().and(comNomeSemelhante(nome)));
     }
 }
