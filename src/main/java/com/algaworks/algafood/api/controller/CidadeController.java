@@ -5,9 +5,8 @@ import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.repository.CidadeRepository;
-import com.algaworks.algafood.domain.service.CidadeService;
+import com.algaworks.algafood.domain.service.CadastroCidadeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +22,7 @@ public class CidadeController {
     private CidadeRepository cidadeRepository;
 
     @Autowired
-    private CidadeService cidadeService;
+    private CadastroCidadeService cadastroCidadeService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -32,18 +31,14 @@ public class CidadeController {
     }
 
     @GetMapping("/{cidadeId}")
-    public ResponseEntity<Cidade> buscar(@PathVariable Long cidadeId) {
-        Optional<Cidade> cidade = cidadeService.buscar(cidadeId);
-        if (cidade.isPresent()) {
-            return ResponseEntity.ok(cidade.get());
-        }
-        return ResponseEntity.notFound().build();
+    public Cidade buscar(@PathVariable Long cidadeId) {
+        return cadastroCidadeService.buscarOuFalhar(cidadeId);
     }
 
     @PostMapping
     public ResponseEntity<?> adicionar(@RequestBody Cidade cidade) {
         try {
-            cidade = cidadeService.salvar(cidade);
+            cidade = cadastroCidadeService.salvar(cidade);
             return ResponseEntity.ok(cidade);
         } catch (EntidadeNaoEncontradaException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -53,7 +48,7 @@ public class CidadeController {
     @DeleteMapping("/{cidadeId}")
     public ResponseEntity<?> remover(@PathVariable Long cidadeId) {
         try {
-            cidadeService.excluir(cidadeId);
+            cadastroCidadeService.excluir(cidadeId);
             return ResponseEntity.noContent().build();
         } catch (EntidadeNaoEncontradaException e) {
             return ResponseEntity.notFound().build();
@@ -65,7 +60,7 @@ public class CidadeController {
     @PutMapping("/{cidadeId}")
     public ResponseEntity<?> atualizar(@PathVariable Long cidadeId, @RequestBody Cidade cidade) {
         try {
-            cidade = cidadeService.atualizar(cidadeId, cidade);
+            cidade = cadastroCidadeService.atualizar(cidadeId, cidade);
             return ResponseEntity.ok(cidade);
         } catch (CidadeNaoEncontradaException e) {
             return ResponseEntity.notFound().build();

@@ -15,11 +15,13 @@ import java.util.Optional;
 @Service
 public class CadastroRestauranteService {
 
+    public static final String MSG_RESTAURANTE_NAO_ENCONTRADO = "Restaurante com o id %d näo encontrado";
+
     @Autowired
     private RestauranteRepository restauranteRepository;
 
     @Autowired
-    private CozinhaRepository cozinhaRepository;
+    private CadastroCozinhaService cadastroCozinhaService;
 
     public Restaurante buscar(Long restauranteId) {
         Optional<Restaurante> restaurante = restauranteRepository.findById(restauranteId);
@@ -31,8 +33,7 @@ public class CadastroRestauranteService {
 
     public Restaurante salvar(Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d näo existe", cozinhaId)));
+        Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
 
         restaurante.setCozinha(cozinha);
 
@@ -42,20 +43,19 @@ public class CadastroRestauranteService {
     public Restaurante atualizar(Long restauranteId, Restaurante restaurante) {
         Optional<Restaurante> restauranteAtual = restauranteRepository.findById(restauranteId);
         Long cozinhaId = restaurante.getCozinha().getId();
-        Optional<Cozinha> cozinha = cozinhaRepository.findById(cozinhaId);
+        Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
 
-        if (cozinha.isEmpty()) {
-            throw new ResutaranteNaoEncontradoException(String.format("Restaurante com o id %d näo encontrado", restauranteId));
-        }
-
-        if (cozinha.isEmpty()) {
-            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d näo existe", cozinhaId));
-        }
-        restaurante.setCozinha(cozinha.get());
+        restaurante.setCozinha(cozinha);
         BeanUtils.copyProperties(restaurante, restauranteAtual.get(), "id", "formasPagamento",
                 "dataCadastro", "produtos");
 
         return restauranteRepository.save(restauranteAtual.get());
+    }
+
+    public Restaurante buscarOuFalhar(Long restauranteId) {
+        return restauranteRepository.findById(restauranteId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(
+                        String.format(MSG_RESTAURANTE_NAO_ENCONTRADO, restauranteId)));
     }
 
 }
