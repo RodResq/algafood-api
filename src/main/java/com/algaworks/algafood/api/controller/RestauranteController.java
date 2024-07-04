@@ -1,10 +1,16 @@
 package com.algaworks.algafood.api.controller;
 
+import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood.domain.exception.NegocioException;
+import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
+import com.algaworks.algafood.domain.service.CadastroCozinhaService;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +33,9 @@ public class RestauranteController {
     @Autowired
     private CadastroRestauranteService cadastroRestauranteService;
 
+    @Autowired
+    private CadastroCozinhaService cadastroCozinhaService;
+
     @GetMapping
     public List<Restaurante> listar() {
         return restauranteRepository.findAll();
@@ -38,13 +47,29 @@ public class RestauranteController {
     }
 
     @PostMapping
-    public Restaurante salvar(@RequestBody Restaurante restaurante) {
-        return cadastroRestauranteService.salvar(restaurante);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Restaurante adicionar(@RequestBody Restaurante restaurante) {
+        try {
+            return cadastroRestauranteService.salvar(restaurante);
+        } catch (EntidadeNaoEncontradaException e) {
+            throw new NegocioException(e.getMessage());
+        }
     }
 
     @PutMapping("/{restauranteId}")
     public Restaurante atualizar(@PathVariable Long restauranteId, @RequestBody Restaurante restaurante) {
-        return cadastroRestauranteService.atualizar(restauranteId, restaurante);
+        Restaurante restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId);
+        Long cozinhaId = restaurante.getCozinha().getId();
+
+        try {
+            Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
+            restaurante.setCozinha(cozinha);
+            BeanUtils.copyProperties(restaurante, restauranteAtual, "id", "formasPagamento",
+                    "dataCadastro", "produtos");
+            return restauranteRepository.save(restauranteAtual);
+        } catch (EntidadeNaoEncontradaException e) {
+            throw new NegocioException(e.getMessage());
+        }
     }
 
     @PatchMapping("/{restauranteId}")
