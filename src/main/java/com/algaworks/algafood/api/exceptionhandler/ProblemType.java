@@ -12,7 +12,8 @@ public enum ProblemType {
     PROPRIEDADE_IGNORADA("/propriedade-ignorada", "Propriedade Ignorada"),
     PROPERIEDADE_DESCONHECIDA("/propriedade-desconhecida", "Propriedade Desconhecida"),
     PARAMETRO_INVALIDO("/parametro-invalido", "Parametro invalido"),
-    ERRO_DE_SISTEMA("/erro-de-sistema", "Erro de Sistema");
+    ERRO_DE_SISTEMA("/erro-de-sistema", "Erro de Sistema"),
+    DADOS_INVALIDOS("/dados-invalidos", "Dados Inválidos");
 
 
     private String title;
