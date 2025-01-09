@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -85,12 +86,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
 
         BindingResult bindResult = ex.getBindingResult();
-        List<Problem.Field> problemFields = bindResult.getFieldErrors().stream()
-                .map(fieldError -> {
-                    String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+        List<Problem.Object> problemObjects = bindResult.getAllErrors().stream()
+                .map(objectError -> {
+                    String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
+                    String name = objectError.getObjectName();
 
-                    return Problem.Field.builder()
-                        .name(fieldError.getField())
+                    if (objectError instanceof FieldError) {
+                        name = ((FieldError) objectError).getField();
+                    }
+                    return Problem.Object.builder()
+                        .name(name)
                         .userMessage(message)
                         .build();
                 })
@@ -98,7 +103,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
-                .fields(problemFields)
+                .objects(problemObjects)
                 .build();
 
         return handleExceptionInternal(ex, problem, headers, status, request);
@@ -139,7 +144,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> handleIgnoredPropertyBinding(IgnoredPropertyException ex, HttpHeaders headers,
-                                                         HttpStatus status, WebRequest request) {
+                                                                HttpStatus status, WebRequest request) {
         String property = joinPath(ex.getPath());
 
         ProblemType problemType = ProblemType.MENSAGEM_IMCOMPREENSIVEL;
